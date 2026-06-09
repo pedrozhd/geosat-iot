@@ -128,6 +128,18 @@ void readAndUpdateDisplay() {
   int solo = analogRead(SOIL_PIN);
   int luz = analogRead(LDR_PIN);
 
+  // Alerta automático: solo seco (< 30%) acende o LED vermelho;
+  // solo adequado acende o LED verde
+  int soloPercent = map(solo, 0, 4095, 0, 100);
+  if (soloPercent < 30) {
+    ledRedState = HIGH;
+    ledGreenState = LOW;
+  } else {
+    ledRedState = LOW;
+    ledGreenState = HIGH;
+  }
+  updateActuators();
+
   // Exibe no Serial
   Serial.println("========== GEO SAT ==========");
   Serial.print("Temperatura: "); Serial.print(temperatura); Serial.println(" °C");
@@ -200,9 +212,8 @@ void handleControl() {
     return;
   }
 
-  // Atualiza variáveis se os campos existirem
-  if (doc.containsKey("led_green")) ledGreenState = doc["led_green"];
-  if (doc.containsKey("led_red")) ledRedState = doc["led_red"];
+  // O relé é o único atuador de controle manual;
+  // os LEDs são automáticos (alerta de umidade do solo)
   if (doc.containsKey("relay")) relayState = doc["relay"];
 
   // Aplica aos pinos físicos
@@ -210,8 +221,6 @@ void handleControl() {
 
   // Resposta com novo estado
   StaticJsonDocument<128> resDoc;
-  resDoc["led_green"] = ledGreenState;
-  resDoc["led_red"] = ledRedState;
   resDoc["relay"] = relayState;
   String response;
   serializeJson(resDoc, response);
@@ -263,19 +272,16 @@ void handleDashboard() {
   <div class="card">
     <h2>⚙️ Atuadores</h2>
     <div>
-      <button id="btnGreenOn" class="actuator btn-on">LED Verde ON</button>
-      <button id="btnGreenOff" class="actuator btn-off">LED Verde OFF</button>
-      <button id="btnRedOn" class="actuator btn-on">LED Vermelho ON</button>
-      <button id="btnRedOff" class="actuator btn-off">LED Vermelho OFF</button>
-      <button id="btnRelayOn" class="actuator btn-on">Relé ON</button>
-      <button id="btnRelayOff" class="actuator btn-off">Relé OFF</button>
+      <button id="btnRelayOn" class="actuator btn-on">Irrigação ON</button>
+      <button id="btnRelayOff" class="actuator btn-off">Irrigação OFF</button>
     </div>
     <h3>Estado atual</h3>
     <table>
-      <tr><td class="label">LED Verde:</td><td id="ledGreenStatus" class="status">--</td></tr>
-      <tr><td class="label">LED Vermelho:</td><td id="ledRedStatus" class="status">--</td></tr>
-      <tr><td class="label">Relé:</td><td id="relayStatus" class="status">--</td></tr>
+      <tr><td class="label">LED Verde (solo adequado):</td><td id="ledGreenStatus" class="status">--</td></tr>
+      <tr><td class="label">LED Vermelho (alerta solo seco):</td><td id="ledRedStatus" class="status">--</td></tr>
+      <tr><td class="label">Relé (irrigação):</td><td id="relayStatus" class="status">--</td></tr>
     </table>
+    <p><em>Os LEDs são automáticos: vermelho acende quando a umidade do solo fica abaixo de 30%.</em></p>
   </div>
   <script>
     function fetchSensors() {
@@ -302,12 +308,11 @@ void handleDashboard() {
         });
     }
 
-    function sendControl(led_green, led_red, relay) {
-      const body = { led_green, led_red, relay };
+    function sendControl(relay) {
       fetch('/api/control', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ relay })
       })
         .then(res => res.json())
         .then(data => {
@@ -316,13 +321,8 @@ void handleDashboard() {
         .catch(err => console.error('Erro controle:', err));
     }
 
-    // Corrigido: Botões agora preservam o estado atual no envio do JSON em vez de mandar null
-    document.getElementById('btnGreenOn').onclick = () => sendControl(true, document.getElementById('ledRedStatus').innerText === 'LIGADO', document.getElementById('relayStatus').innerText === 'ATIVADO');
-    document.getElementById('btnGreenOff').onclick = () => sendControl(false, document.getElementById('ledRedStatus').innerText === 'LIGADO', document.getElementById('relayStatus').innerText === 'ATIVADO');
-    document.getElementById('btnRedOn').onclick = () => sendControl(document.getElementById('ledGreenStatus').innerText === 'LIGADO', true, document.getElementById('relayStatus').innerText === 'ATIVADO');
-    document.getElementById('btnRedOff').onclick = () => sendControl(document.getElementById('ledGreenStatus').innerText === 'LIGADO', false, document.getElementById('relayStatus').innerText === 'ATIVADO');
-    document.getElementById('btnRelayOn').onclick = () => sendControl(document.getElementById('ledGreenStatus').innerText === 'LIGADO', document.getElementById('ledRedStatus').innerText === 'LIGADO', true);
-    document.getElementById('btnRelayOff').onclick = () => sendControl(document.getElementById('ledGreenStatus').innerText === 'LIGADO', document.getElementById('ledRedStatus').innerText === 'LIGADO', false);
+    document.getElementById('btnRelayOn').onclick = () => sendControl(true);
+    document.getElementById('btnRelayOff').onclick = () => sendControl(false);
 
     setInterval(() => {
       fetchSensors();

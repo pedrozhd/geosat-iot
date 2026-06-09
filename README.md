@@ -29,8 +29,8 @@ Alinhado aos ODS da ONU: 2 (Fome Zero e Agricultura Sustentável), 9 (Indústria
 | DHT22 | GPIO 4 | Entrada: temperatura e umidade do ar |
 | Potenciômetro | GPIO 34 (ADC) | Entrada: simula sensor de umidade do solo |
 | LDR (fotoresistor) | GPIO 35 (ADC) | Entrada: luminosidade |
-| LED Verde | GPIO 2 | Saída: indicador de status |
-| LED Vermelho | GPIO 15 | Saída: indicador de alerta |
+| LED Verde | GPIO 2 | Saída: solo adequado (umidade ≥ 30%), automático |
+| LED Vermelho | GPIO 15 | Saída: alerta de solo seco (umidade < 30%), automático |
 | Módulo Relé | GPIO 5 | Saída: acionamento da irrigação |
 | OLED SSD1306 | GPIO 21 (SDA) / GPIO 22 (SCL) | Interface local (endereço I2C 0x3C) |
 
@@ -65,14 +65,14 @@ Resposta `200 application/json`:
 }
 ```
 
-### 3. `POST /api/control` — controla os atuadores
+### 3. `POST /api/control` — controla a irrigação (relé)
 
-Corpo da requisição (`Content-Type: application/json`, campos opcionais):
+Os LEDs são automáticos (alerta de umidade do solo); o relé é o atuador de controle remoto.
+
+Corpo da requisição (`Content-Type: application/json`):
 
 ```json
 {
-  "led_green": true,
-  "led_red": false,
   "relay": true
 }
 ```
@@ -81,8 +81,6 @@ Resposta `200 application/json` (novo estado):
 
 ```json
 {
-  "led_green": true,
-  "led_red": false,
   "relay": true
 }
 ```
@@ -102,8 +100,8 @@ curl -X POST http://<IP>/api/control -H "Content-Type: application/json" -d "{\"
 O endpoint `GET /` serve o dashboard web diretamente do ESP32, com:
 
 - Leituras dos sensores atualizadas a cada 2 segundos (temperatura, umidade do ar, solo e luminosidade);
-- Botões para ligar/desligar LED verde, LED vermelho e relé de irrigação;
-- Estado atual dos atuadores em tempo real.
+- Botões para ligar/desligar a irrigação (relé);
+- Estado dos LEDs de alerta (automáticos, conforme a umidade do solo) e do relé em tempo real.
 
 ## Como executar
 
