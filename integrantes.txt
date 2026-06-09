@@ -1,0 +1,10 @@
+Equipe: GeoSat
+FIAP | Global Solution 2026/1 | Economia do Espaco
+Disciplina: Disruptive Architectures: IoT, IOB & Generative IA
+
+Nome             RM      Turma
+Altamir Lima     562906  2TDSR
+Felipe Conte     562248  2TDSR
+Luiz Goncalves   564495  2TDSR
+Olavo Neves      563558  2TDSR
+Pedro Franca     561940  2TDSR

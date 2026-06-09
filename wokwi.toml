@@ -1,0 +1,9 @@
+[wokwi]
+version = 1
+firmware = 'build/sketch.ino.bin'
+elf = 'build/sketch.ino.elf'
+diagram = 'diagram.json'
+
+[[net.forward]]
+from = "localhost:9080"
+to = "target:80"

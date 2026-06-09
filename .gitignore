@@ -1,0 +1,5 @@
+# Artefatos de compilação (regenerar com: arduino-cli compile --fqbn esp32:esp32:esp32 sketch --output-dir build)
+build/
+
+# Configurações locais do editor
+.vscode/
