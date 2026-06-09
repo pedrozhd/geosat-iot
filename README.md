@@ -156,7 +156,7 @@ Observação: mantenha a aba do simulador visível — se ficar oculta, a simula
 
 Vídeo (até 3 minutos) apresentando a proposta de solução e o funcionamento do sistema:
 
-**Link:** [ADICIONAR LINK DO VÍDEO AQUI]
+**Link:** [https://youtu.be/n78uGOrX4f8](https://youtu.be/n78uGOrX4f8)
 
 ## Integrantes
 
