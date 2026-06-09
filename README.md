@@ -12,7 +12,7 @@ Alinhado aos ODS da ONU: 2 (Fome Zero e Agricultura Sustentável), 9 (Indústria
 
 | Requisito | Como é atendido |
 | :--- | :--- |
-| Protótipo funcional com ESP32 | Simulação completa no Wokwi (`sketch.ino` + `diagram.json`) |
+| Protótipo funcional com ESP32 | Simulação completa no Wokwi (`sketch/sketch.ino` + `diagram.json`) |
 | 2 entradas (sensores, botões ou equivalentes) | DHT22 (temperatura/umidade do ar), potenciômetro (umidade do solo) e LDR (luminosidade) |
 | 2 saídas (LEDs, atuadores ou equivalentes) | LED verde, LED vermelho e módulo relé (irrigação) |
 | 1 interface local (LCD, OLED ou similar) | Display OLED SSD1306 128x64 (I2C) |
